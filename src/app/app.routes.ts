@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { authGuard, invitadoGuard } from './core/guards/auth-guard';
 import { permisoGuard } from './core/guards/permiso-guard';
-import { Login } from './features/auth/pages/login/login';
 import { AccesoDenegado } from './shared/pages/acceso-denegado/acceso-denegado';
 import { NoEncontrado } from './shared/pages/no-encontrado/no-encontrado';
 
@@ -11,7 +10,7 @@ export const routes: Routes = [
     path: 'login',
     title: 'Iniciar sesión · PharmaSoft',
     canActivate: [invitadoGuard],
-    component: Login,
+    loadComponent: () => import('./features/auth/pages/login/login').then((m) => m.Login),
   },
   {
     path: '',

@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../core/auth/auth-service';
+import { MasVendidos } from './mas-vendidos';
 
 @Component({
   selector: 'app-inicio',
-  imports: [RouterLink],
+  imports: [RouterLink, MasVendidos],
   template: `
     <section class="welcome">
       <p class="eyebrow">PHARMASOFT · OPERACIONES</p>
@@ -15,7 +17,18 @@ import { RouterLink } from '@angular/router';
       <a class="quick-card" routerLink="/categorias"><span class="quick-icon">▦</span><span><small>CATÁLOGO</small><strong>Categorías</strong><em>Organiza tus productos</em></span><b>↗</b></a>
       <a class="quick-card" routerLink="/clientes"><span class="quick-icon">♙</span><span><small>RELACIONES</small><strong>Clientes</strong><em>Consulta y actualiza registros</em></span><b>↗</b></a>
     </section>
-    <p class="note"><span class="note-dot"></span> Conectado a PharmaBackend <code>localhost:8080</code></p>
+    @if (auth.tienePermiso('REPORTES_VER')) {
+      @defer (on viewport) {
+        <app-mas-vendidos />
+      } @placeholder {
+        <p class="report-placeholder">Productos más vendidos</p>
+      } @loading (minimum 300ms) {
+        <p class="report-placeholder">Cargando reporte…</p>
+      } @error {
+        <p class="report-error">No se pudo cargar el reporte.</p>
+      }
+    }
+    <p class="note"><span class="note-dot"></span> Servicios de PharmaSoft disponibles</p>
   `,
   styles: [`
     .welcome { padding: clamp(27px, 5vw, 58px); border: 1px solid #e3e8f0; border-radius: 22px; background: linear-gradient(115deg,#fff 15%,#eef2f8 100%); }
@@ -35,8 +48,11 @@ import { RouterLink } from '@angular/router';
     .quick-icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px; background: #eef2f8; color: #0f2e5c; font-size: 20px; }
     .note { display: flex; align-items: center; gap: 8px; margin: 21px 3px; color: #6b7280; font-size: 11px; }
     .note-dot { width: 7px; height: 7px; border-radius: 50%; background: #f2a900; }
-    code { color: #1f2937; }
+    .report-placeholder, .report-error { margin: 18px 0 0; padding: 18px; border: 1px solid #e3e8f0; border-radius: 15px; background: #fff; color: #6b7280; font-size: 13px; }
+    .report-error { color: #9b1c1c; }
     @media(max-width:600px) { .quick-grid { grid-template-columns: 1fr; } }
   `],
 })
-export class Inicio {}
+export class Inicio {
+  protected readonly auth = inject(AuthService);
+}
